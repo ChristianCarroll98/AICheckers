@@ -22,7 +22,7 @@ public class AIblackMove {
     public AIblackMove(CheckersGame game, CheckersMove moves[]) {
         currentGame = game;
         legalMoves = moves;
-		iter = 5;
+		iter = 7;
     }
 
     // This is where your logic goes to make a move.
