@@ -27,6 +27,8 @@ public class AIblackMove {
     // This is where your logic goes to make a move.
     public CheckersMove nextMove() {
 		
+		MovePair testPair = new MovePair(currentGame.boardData.getLegalMoves(CheckersData.BLACK)[0], 10);
+		System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
         return minmax(currentGame.boardData, iter);
     }
@@ -67,7 +69,7 @@ public class AIblackMove {
 				int minValue = evaluate(board);
 				
 				//recursion code
-				if(iter > 0){
+				if(iter > 0 && minValue > 0){
 					//call minmax again with board after the current move, and iteration -1
 					board.makeMove(minmax(board, iter - 1));
 					
@@ -143,6 +145,7 @@ public class AIblackMove {
     int evaluate(CheckersData board) {
 		//did not change this much. yet.
         return board.numBlack()+ 2*board.numBlackKing()
+		
                 - board.numRed() - 2*board.numRedKing();
     }
 }
