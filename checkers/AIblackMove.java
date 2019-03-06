@@ -34,7 +34,6 @@ public class AIblackMove {
     }
 	
 	MovePair minmax(CheckersData b, CheckersMove initialMove, int depth, int alpha, int beta, boolean maximizing) {
-
 		if (!((depth == 0) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))) {
 
 			if (maximizing) {
@@ -56,6 +55,7 @@ public class AIblackMove {
 
 					if (beta <= alpha)
 						break;
+
 					return new MovePair(initialMove, maxEval);
 				}
 			} else {
@@ -77,6 +77,7 @@ public class AIblackMove {
 				}
 			}
 		}
+		System.out.println("depth: " + depth);
 		return new MovePair(initialMove, evaluate(b));
 	}
 	
@@ -117,6 +118,8 @@ public class AIblackMove {
 		}
 
         return eval;
+		//return board.getNumPieces(CheckersData.BLACK) + 2*board.getNumPieces(CheckersData.BLACK_KING) -
+		//		board.getNumPieces(CheckersData.RED) - 2*board.getNumPieces(CheckersData.RED_KING);
     }
 }
 /*
