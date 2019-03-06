@@ -23,7 +23,7 @@ public class CheckersGame {
     CheckersData boardData;
     CheckersMove[] legalMoves;  // An array containing the legal moves for the
     //   current player.
-
+	
     int selectedRow, selectedCol;  // If the current player has selected a piece to
     //     move, these give the row and column
     //     containing that piece.  If no piece is
@@ -172,7 +172,7 @@ public class CheckersGame {
         /* If the player clicked on one of the pieces that the player
          can move, mark this row and col as selected and return.  (This
          might change a previous selection.)  Reset the message, in
-         case it was previously displaying an error message. */
+         case it was previously displaying an error . */
         for (int i = 0; i < legalMoves.length; i++) {
             System.out.println("In one");
             if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {

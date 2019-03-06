@@ -27,15 +27,16 @@ public class AIblackMove {
     // This is where your logic goes to make a move.
     public CheckersMove nextMove() {
 		
-		MovePair testPair = new MovePair(currentGame.boardData.getLegalMoves(CheckersData.BLACK)[0], 10);
-		System.out.println(testPair.move.toString() + ", " + testPair.value);
+		//MovePair testPair = new MovePair(currentGame.boardData.getLegalMoves(CheckersData.BLACK)[0], 10);
+		//System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
+
         return minmax(currentGame.boardData, iter);
     }
 	
 	CheckersMove minmax(CheckersData b, int iter){
 		
-		// create new board so we dont mess up the original
+		// create new board so we don't mess up the original
 		CheckersData board = new CheckersData(b);
 		
 		//set best black move to default mve from 0,0 to 0,0 in case no moves exist
@@ -143,10 +144,37 @@ public class AIblackMove {
     // number of pieces important, but board position could also be important.
     // Also, are kings more valuable than regular pieces?  How much?
     int evaluate(CheckersData board) {
-		//did not change this much. yet.
-        return board.numBlack()+ 2*board.numBlackKing()
 		
-                - board.numRed() - 2*board.numRedKing();
+		//added boardValue static array to CheckersData constructor
+		//eval += (value of piece at (0,0) * board.boardValues[0][0];)
+
+		int eval = 0;
+
+		for(int y = 0; y < 8; y++){
+			for(int x = Math.floorMod(y,2); x < 8; x+=2){ //x starts at 0 when y is even and starts at 1 when y is odd
+
+				int piece = board.pieceAt(x,y);
+				int pieceVal = 0;
+				switch(piece){
+					case CheckersData.BLACK:
+						pieceVal = 2;
+						break;
+					case CheckersData.BLACK_KING:
+						pieceVal = 4;
+						break;
+					case CheckersData.RED:
+						pieceVal = -1;
+						break;
+					case CheckersData.RED_KING:
+						pieceVal = -2;
+						break;
+				}
+
+				eval += (CheckersData.boardValues[0][0] * pieceVal); //multiply board value by piece value.
+			}
+		}
+
+        return eval;
     }
 }
 /*

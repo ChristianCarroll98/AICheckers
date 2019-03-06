@@ -36,7 +36,21 @@ import java.util.Random;
       /**
        * Constructor.  Create the board and set it up for a new game.
        */
-      CheckersData() {
+
+      static int[][] boardValues = {
+              {4, 0, 4, 0, 4, 0, 4, 0},
+              {0, 2, 0, 2, 0, 2, 0, 3},
+              {3, 0, 1, 0, 1, 0, 1, 0},
+              {0, 2, 0, 4, 0, 3, 0, 3},
+              {3, 0, 3, 0, 4, 0, 2, 0},
+              {0, 1, 0, 1, 0, 1, 0, 3},
+              {3, 0, 2, 0, 2, 0, 2, 0},
+              {0, 4, 0, 4, 0, 4, 0, 4}
+
+      };
+
+    CheckersData() {
+		  
          board = new int[8][8];
          shadow_board = new int[8][8];
          setUpGame();
