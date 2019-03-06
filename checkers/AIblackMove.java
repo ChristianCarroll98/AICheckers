@@ -21,7 +21,6 @@ public class AIblackMove {
     public AIblackMove(CheckersGame game, CheckersMove moves[]) {
         currentGame = game;
         legalMoves = moves;
-		iter = 5;
     }
 
     // This is where your logic goes to make a move.
@@ -31,111 +30,54 @@ public class AIblackMove {
 		//System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
 
-        return minmax(currentGame.boardData, iter);
+        return minmax(currentGame.boardData, null, 1000, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
-	CheckersMove minmax(CheckersData b, int iter){
-		
-		// create new board so we don't mess up the original
-		CheckersData board = new CheckersData(b);
-		
-		//set best black move to default mve from 0,0 to 0,0 in case no moves exist
-		CheckersMove bestBlackMove = new CheckersMove(0,0,0,0);
-		
-		// get all black moves
-		CheckersMove blackMoves[] = board.getLegalMoves(CheckersData.BLACK);
-		
-		if(blackMoves != null && blackMoves.length > 0){
-			
-			//initialize best black move to first one in list
-			bestBlackMove = blackMoves[0];
-			
-			//create variable to keep track of highest minimum
-			int bestMinmax = Integer.MIN_VALUE;
-			
-			//iterate through all black moves
-			for(int i = 0; i<blackMoves.length; i++){
-				//reset board to initial state
-				board = new CheckersData(b);
-				
-				//make the black move
-				board.makeMove(blackMoves[i]);
-				
-				//if red has a move, make the best one. method is below.
-				//otherwise, this move makes red lose so pick it.
-				if(!makeBestRedMove(board))
-					return blackMoves[i];
+	MovePair minmax(CheckersData b, CheckersMove initialMove, int depth, int alpha, int beta, boolean maximizing) {
 
-				//find new evaluated value of the board after red makes its move
-				int minValue = evaluate(board);
-				
-				//recursion code
-				if(iter > 0 && minValue > 0){
-					//call minmax again with board after the current move, and iteration -1
-					board.makeMove(minmax(board, iter - 1));
-					
-					//veriable that holds new value of board
-					//(perhaps this is the state of the board at the end of the iteration?)
-					int testVal = evaluate(board);
-					
-					//if the test value is larger than the best Minmax then set the stuff.
-					if( testVal > bestMinmax ){
-						bestMinmax = testVal;
-						bestBlackMove = blackMoves[i];
-					}
+		if (!((depth == 0) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))) {
+
+			if (maximizing) {
+
+				int maxEval = Integer.MIN_VALUE;
+
+				for (CheckersMove move : b.getLegalMoves(CheckersData.BLACK)) {
+
+					if (initialMove == null)
+						initialMove = move;
+
+					CheckersData testBoard = new CheckersData(b);
+					testBoard.makeMove(move);
+
+					int eval = minmax(testBoard, initialMove, depth - 1, alpha, beta, false).value;
+
+					maxEval = Math.max(maxEval, eval);
+					alpha = Math.max(alpha, eval);
+
+					if (beta <= alpha)
+						break;
+					return new MovePair(initialMove, maxEval);
 				}
-				//base case, if minvalue of board is larger than minmax then set the stuff.
-				else{
-					if(minValue > bestMinmax){
-						bestMinmax = minValue;
-						bestBlackMove = blackMoves[i];
-					}
-				}
-				
-			}
-		}//end if statement and black moves for loop
-		return bestBlackMove;
-	}
-	
-	/**
-	* Picks best red move and makes it, then returns true.
-	* If no moves are available, return false.
-	*/
-	boolean makeBestRedMove(CheckersData board){
-		
-		//find all red moves
-		CheckersMove redMoves[] = board.getLegalMoves(CheckersData.RED);
-		
-		//if no red moves exist, return false
-		if(redMoves != null && redMoves.length > 0) {
-		
-			//otherwise set best move to first in list initially
-			CheckersMove bestRedMove = redMoves[0];
-			
-			//create variable to hold minimum evaluated value
-			int minValue = Integer.MAX_VALUE;
-			
-			//iterate through red moves
-			for(int i = 0; i<redMoves.length; i++){
-				//create copy of board
-				CheckersData redTest = new CheckersData(board);
-				
-				//make the red move
-				redTest.makeMove(redMoves[i]);
-				
-				//evaluate board and if the value is lower, set new best move and min value.
-				int testVal = evaluate(redTest);
-				if( testVal < minValue ){
-					minValue = testVal;
-					bestRedMove = redMoves[i];
+			} else {
+				int minEval = Integer.MAX_VALUE;
+
+				for (CheckersMove move : b.getLegalMoves(CheckersData.RED)) {
+
+					CheckersData testBoard = new CheckersData(b);
+					testBoard.makeMove(move);
+
+					int eval = minmax(testBoard, initialMove, depth - 1, alpha, beta, true).value;
+
+					minEval = Math.min(minEval, eval);
+					beta = Math.min(beta, eval);
+
+					if (beta <= alpha)
+						break;
+					return new MovePair(initialMove, minEval);
 				}
 			}
-			//make the best red move and return true
-			board.makeMove(bestRedMove);
-			return true;
 		}
-		//if no red moves exist, return false
-		return false;
+		return new MovePair(initialMove, evaluate(b));
 	}
 	
     // One thing you will probably want to do is evaluate the current
@@ -157,10 +99,10 @@ public class AIblackMove {
 				int pieceVal = 0;
 				switch(piece){
 					case CheckersData.BLACK:
-						pieceVal = 2;
+						pieceVal = 1;
 						break;
 					case CheckersData.BLACK_KING:
-						pieceVal = 4;
+						pieceVal = 2;
 						break;
 					case CheckersData.RED:
 						pieceVal = -1;
