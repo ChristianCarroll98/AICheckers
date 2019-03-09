@@ -30,7 +30,7 @@ public class AIblackMove {
 		//System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
 
-        return minmax(System.currentTimeMillis(), 10, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
+        return minmax(System.currentTimeMillis(), 200, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
 	MovePair minmax(long startTime, int depth, CheckersData b, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
@@ -48,10 +48,14 @@ public class AIblackMove {
 
 					MovePair eval;
 
+					if(testBoard.getLegalJumpsFrom(testBoard.pieceAt(blackMove.toRow, blackMove.toCol),
+                            blackMove.toRow, blackMove.toCol) != null)
+                        maximizing = !maximizing;
+
                     if (initialMove == null) {
-                        eval = minmax(startTime, depth - 1, testBoard, blackMove, alpha, beta, false);
+                        eval = minmax(startTime, depth - 1, testBoard, blackMove, alpha, beta, !maximizing);
                     }else {
-                        eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, false);
+                        eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
                     }
 
                     if(maxEval.value < eval.value) maxEval = eval;
@@ -69,7 +73,11 @@ public class AIblackMove {
                     CheckersData testBoard = new CheckersData(b);
                     testBoard.makeMove(redMove);
 
-                    MovePair eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, false);
+                    if(testBoard.getLegalJumpsFrom(testBoard.pieceAt(redMove.toRow, redMove.toCol),
+                            redMove.toRow, redMove.toCol) != null)
+                        maximizing = !maximizing;
+
+                    MovePair eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
 
                     if(minEval.value > eval.value) minEval = eval;
 
@@ -92,8 +100,8 @@ public class AIblackMove {
     int evaluate(CheckersData board) {
 
         //int eval =
-        return board.numBlack() + 2*board.numBlackKing() -
-                board.numRed() - 2*board.numRedKing();
+        return board.numBlack() + board.numBlackKing() -
+                board.numRed() - board.numRedKing();
         //System.out.println(eval);
         /*for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd

@@ -153,14 +153,14 @@ public class CheckersGame {
 			if (currentPlayer() == CheckersData.BLACK
                     && aiBlack == true) {
                 //System.out.println("black move");
-				try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
+				//try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
                 AIblackMove blacksMove = new AIblackMove(this,legalMoves);
                 doMakeMove(blacksMove.nextMove());
                 return;
             } else if (currentPlayer() == CheckersData.RED
                     && aiRed == true) {
                 //System.out.println("red move");
-				try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
+				//try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
                 AIredMove redsMove = new AIredMove(this,legalMoves);
                 // AIredMoveBetter redsMove = new AIredMoveBetter(this, legalMoves);
                 doMakeMove(redsMove.nextMove());
