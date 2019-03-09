@@ -38,12 +38,9 @@ public class AIblackMove {
 		if (!((depth == 0) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))){
 
 			if (maximizing) {
-
 				MovePair maxEval = new MovePair(null, Integer.MIN_VALUE);
 
-                CheckersMove[] blackMoves = b.getLegalMoves(CheckersData.BLACK);
-
-				for (CheckersMove blackMove : blackMoves) {
+				for (CheckersMove blackMove : b.getLegalMoves(CheckersData.BLACK)) {
 
 					CheckersData testBoard = new CheckersData(b);
 					testBoard.makeMove(blackMove);
@@ -60,16 +57,13 @@ public class AIblackMove {
 
 					alpha = Math.max(alpha, eval.value);
 
-					if (beta <= alpha)
-						break;
+					if (beta <= alpha) break;
 				}
 				return maxEval;
 			} else {
 				MovePair minEval = new MovePair(null, Integer.MAX_VALUE);
 
-                CheckersMove[] redMoves = b.getLegalMoves(CheckersData.BLACK);
-
-                for (CheckersMove redMove : redMoves) {
+                for (CheckersMove redMove : b.getLegalMoves(CheckersData.RED)) {
 
                     CheckersData testBoard = new CheckersData(b);
                     testBoard.makeMove(redMove);
@@ -80,10 +74,8 @@ public class AIblackMove {
 
                     beta = Math.min(beta, eval.value);
 
-                    if (beta <= alpha)
-                        break;
+                    if (beta <= alpha) break;
                 }
-                System.out.println(minEval.value);
                 return minEval;
 			}
 		}
@@ -99,10 +91,9 @@ public class AIblackMove {
     int evaluate(CheckersData board) {
 
         int eval = board.getNumPieces(CheckersData.BLACK) + 2*board.getNumPieces(CheckersData.BLACK_KING) - board.getNumPieces(CheckersData.RED) - 2*board.getNumPieces(CheckersData.RED_KING);
-
-        for(int y = 0; y < 8; y++) {
+        //System.out.println(eval);
+        /*for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
-
                 int piece = board.pieceAt(x, y);
 
                 if (piece == 0) break;
@@ -110,12 +101,12 @@ public class AIblackMove {
                 if (board.getLegalJumpsFrom(piece, x, y) != null) {
                     int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
                     if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
-                        eval += 20 * numJumps;
+                        eval += 10 * numJumps;
                     else
-                        eval -= 20 * numJumps;
+                        eval -= 10 * numJumps;
                 }
             }
-        }
-        return eval;
+        }*/
+        return 100*eval;
     }
 }
