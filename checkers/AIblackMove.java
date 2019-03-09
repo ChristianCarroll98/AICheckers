@@ -30,12 +30,13 @@ public class AIblackMove {
 		//System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
 
-        return minmax(System.currentTimeMillis(), currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
+        return minmax(System.currentTimeMillis(), 10, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
-	MovePair minmax(long curTime, CheckersData b, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
-        System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-		if (!((System.currentTimeMillis() - curTime > 3000) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))){
+	MovePair minmax(long startTime, int depth, CheckersData b, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
+        //System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
+        //System.out.println(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory());
+		if (!(((System.currentTimeMillis() - startTime) > 3000) || (depth == 0) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))){
 
 			if (maximizing) {
 				MovePair maxEval = new MovePair(null, Integer.MIN_VALUE);
@@ -48,9 +49,9 @@ public class AIblackMove {
 					MovePair eval;
 
                     if (initialMove == null) {
-                        eval = minmax(curTime, testBoard, blackMove, alpha, beta, false);
+                        eval = minmax(startTime, depth - 1, testBoard, blackMove, alpha, beta, false);
                     }else {
-                        eval = minmax(curTime, testBoard, initialMove, alpha, beta, false);
+                        eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, false);
                     }
 
                     if(maxEval.value < eval.value) maxEval = eval;
@@ -68,7 +69,7 @@ public class AIblackMove {
                     CheckersData testBoard = new CheckersData(b);
                     testBoard.makeMove(redMove);
 
-                    MovePair eval = minmax(curTime, testBoard, initialMove, alpha, beta, false);
+                    MovePair eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, false);
 
                     if(minEval.value > eval.value) minEval = eval;
 
@@ -90,10 +91,11 @@ public class AIblackMove {
     // Also, are kings more valuable than regular pieces?  How much?
     int evaluate(CheckersData board) {
 
-        int eval = board.numBlack() + 2*board.numBlackKing() -
+        //int eval =
+        return board.numBlack() + 2*board.numBlackKing() -
                 board.numRed() - 2*board.numRedKing();
         //System.out.println(eval);
-        for(int y = 0; y < 8; y++) {
+        /*for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
                 int piece = board.pieceAt(x, y);
 
@@ -107,7 +109,7 @@ public class AIblackMove {
                         eval -= numJumps;
                 }
             }
-        }
-        return eval;
+        }*/
+        //return eval;
     }
 }
