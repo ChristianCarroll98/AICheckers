@@ -149,7 +149,7 @@ public class CheckersGame {
                 return;
             }*/
         
-		
+
 			if (currentPlayer() == CheckersData.BLACK
                     && aiBlack == true) {
                 //System.out.println("black move");

@@ -37,16 +37,38 @@ import java.util.Random;
        * Constructor.  Create the board and set it up for a new game.
        */
 
-      static int[][] boardValues = {
+        static int[][] midGameBoardValues = {
               {4, 0, 4, 0, 4, 0, 4, 0},
-              {0, 2, 0, 2, 0, 2, 0, 3},
-              {3, 0, 1, 0, 1, 0, 1, 0},
-              {0, 2, 0, 4, 0, 3, 0, 3},
-              {3, 0, 3, 0, 4, 0, 2, 0},
-              {0, 1, 0, 1, 0, 1, 0, 3},
-              {3, 0, 2, 0, 2, 0, 2, 0},
+              {0, 2, 0, 2, 0, 2, 0, 4},
+              {4, 0, 3, 0, 3, 0, 1, 0},
+              {0, 1, 0, 4, 0, 3, 0, 4},
+              {4, 0, 3, 0, 4, 0, 1, 0},
+              {0, 1, 0, 3, 0, 3, 0, 4},
+              {4, 0, 2, 0, 2, 0, 2, 0},
               {0, 4, 0, 4, 0, 4, 0, 4}
-      };
+        };
+
+        static int[][] endGameBoardValues = {
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 1, 0, 1, 0, 1},
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 1, 0, 1, 0, 1},
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 1, 0, 1, 0, 100},
+                {1, 0, 1, 0, 1, 0, 100, 0},
+                {0, 1, 0, 1, 0, 100, 0, 100}
+        };
+
+        static int[][] earlyGameBoardValues = {
+                {100, 0, 100, 0, 100, 0, 100, 0},
+                {0, 1, 0, 1, 0, 1, 0, 1},
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 1, 0, 1, 0, 1},
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 1, 0, 1, 0, 1, 0, 1},
+                {1, 0, 1, 0, 1, 0, 1, 0},
+                {0, 100, 0, 100, 0, 100, 0, 100}
+        };
 
     CheckersData() {
 		  
@@ -157,7 +179,7 @@ import java.util.Random;
        * Return the contents of the square in the specified row and column.
        */
        int pieceAt(int row, int col) {
-	   return board[row][col];
+	        return board[row][col];
        }
             
        int pieceAtshadow(int row, int col) {
