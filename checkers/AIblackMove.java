@@ -90,8 +90,8 @@ public class AIblackMove {
     // Also, are kings more valuable than regular pieces?  How much?
     int evaluate(CheckersData board) {
 
-        int eval = board.numBlack() + board.numBlackKing() -
-                board.numRed() - board.numRedKing();
+        int eval = board.numBlack() + 2*board.numBlackKing() -
+                board.numRed() - 2*board.numRedKing();
         //System.out.println(eval);
         for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
