@@ -30,7 +30,7 @@ public class AIblackMove {
 		//System.out.println(testPair.move.toString() + ", " + testPair.value);
 		//returns best move based on minmax function
 
-        return minmax(System.currentTimeMillis(), 200, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
+        return minmax(System.currentTimeMillis(), 300, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
 	MovePair minmax(long startTime, int depth, CheckersData b, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
@@ -88,7 +88,7 @@ public class AIblackMove {
                 return minEval;
 			}
 		}
-
+        //System.out.println(300-depth);
 		return new MovePair(initialMove, evaluate(b));
 	}
 
@@ -100,8 +100,8 @@ public class AIblackMove {
     int evaluate(CheckersData board) {
 
         //int eval =
-        return board.numBlack() + board.numBlackKing() -
-                board.numRed() - board.numRedKing();
+        return board.numBlack() + 2*board.numBlackKing() -
+                board.numRed() - 2*board.numRedKing();
         //System.out.println(eval);
         /*for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
