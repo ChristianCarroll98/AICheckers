@@ -8,7 +8,7 @@
  *
  * @author phil
  */
-public class AIblackMove {
+public class AIblackMove{
 
     //This is the current state of the game
     CheckersGame currentGame;
@@ -25,25 +25,20 @@ public class AIblackMove {
 
     // This is where your logic goes to make a move.
     public CheckersMove nextMove() {
-
-		//MovePair testPair = new MovePair(currentGame.boardData.getLegalMoves(CheckersData.BLACK)[0], 10);
-		//System.out.println(testPair.move.toString() + ", " + testPair.value);
-		//returns best move based on minmax function
-
         return minmax(System.currentTimeMillis(), 300, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
-	MovePair minmax(long startTime, int depth, CheckersData b, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
-        //System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-        //System.out.println(Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory());
-		if (!(((System.currentTimeMillis() - startTime) > 3000) || (depth == 0) || (b.getLegalMoves(CheckersData.BLACK) == null) || (b.getLegalMoves(CheckersData.RED) == null))){
+	MovePair minmax(long startTime, int depth, CheckersData initialBoard, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
+
+		if (!(((System.currentTimeMillis() - startTime) > 6000) || (depth == 0) ||
+                (initialBoard.getLegalMoves(CheckersData.BLACK) == null) || (initialBoard.getLegalMoves(CheckersData.RED) == null))){
 
 			if (maximizing) {
-				MovePair maxEval = new MovePair(null, Integer.MIN_VALUE);
+				MovePair maxEval = new MovePair(initialMove, Integer.MIN_VALUE);
 
-				for (CheckersMove blackMove : b.getLegalMoves(CheckersData.BLACK)) {
+				for (CheckersMove blackMove : initialBoard.getLegalMoves(CheckersData.BLACK)) {
 
-					CheckersData testBoard = new CheckersData(b);
+					CheckersData testBoard = new CheckersData(initialBoard);
 					testBoard.makeMove(blackMove);
 
 					MovePair eval;
@@ -58,19 +53,20 @@ public class AIblackMove {
                         eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
                     }
 
-                    if(maxEval.value < eval.value) maxEval = eval;
+                    if(maxEval.value <= eval.value) maxEval = eval;
 
 					alpha = Math.max(alpha, eval.value);
 
 					if (beta <= alpha) break;
 				}
+
 				return maxEval;
 			} else {
-				MovePair minEval = new MovePair(null, Integer.MAX_VALUE);
+				MovePair minEval = new MovePair(initialMove, Integer.MAX_VALUE);
 
-                for (CheckersMove redMove : b.getLegalMoves(CheckersData.RED)) {
+                for (CheckersMove redMove : initialBoard.getLegalMoves(CheckersData.RED)) {
 
-                    CheckersData testBoard = new CheckersData(b);
+                    CheckersData testBoard = new CheckersData(initialBoard);
                     testBoard.makeMove(redMove);
 
                     if(testBoard.getLegalJumpsFrom(testBoard.pieceAt(redMove.toRow, redMove.toCol),
@@ -79,7 +75,7 @@ public class AIblackMove {
 
                     MovePair eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
 
-                    if(minEval.value > eval.value) minEval = eval;
+                    if(minEval.value >= eval.value) minEval = eval;
 
                     beta = Math.min(beta, eval.value);
 
@@ -88,36 +84,73 @@ public class AIblackMove {
                 return minEval;
 			}
 		}
-        //System.out.println(300-depth);
-		return new MovePair(initialMove, evaluate(b));
+		return new MovePair(initialMove, evaluate(initialBoard));
 	}
 
-    // One thing you will probably want to do is evaluate the current
-    // goodness of the board.  This is a toy example, and probably isn't
-    // very good, but you can tweak it in any way you want.  Not only is
-    // number of pieces important, but board position could also be important.
-    // Also, are kings more valuable than regular pieces?  How much?
     int evaluate(CheckersData board) {
 
-        //int eval =
-        return board.numBlack() + 2*board.numBlackKing() -
+        if(board.getLegalMoves(CheckersData.RED) == null)
+            return Integer.MAX_VALUE;
+
+        if(board.getLegalMoves(CheckersData.BLACK) == null)
+            return Integer.MIN_VALUE;
+/*
+        int eval = board.numBlack() + 2*board.numBlackKing() -
                 board.numRed() - 2*board.numRedKing();
-        //System.out.println(eval);
-        /*for(int y = 0; y < 8; y++) {
+
+        for(int y = 0; y < 8; y++) {
             for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
+
                 int piece = board.pieceAt(x, y);
 
-                if (piece == 0) break;
+                if (piece == CheckersData.EMPTY) break;
 
+//                if(board.numBlack() + board.numBlackKing() + board.numRed() + board.numRedKing() == 24) { // set up initial moves
+//                    switch (piece) {
+//                        case CheckersData.BLACK:
+//                            eval += CheckersData.blackBoardValues[x][y];
+//                            break;
+//                        case CheckersData.BLACK_KING:
+//                            eval += 2 * CheckersData.blackBoardValues[x][y];
+//                            break;
+//                        case CheckersData.RED:
+//                            eval -= CheckersData.redBoardValues[x][y];
+//                            break;
+//                        case CheckersData.RED_KING:
+//                            eval -= 2 * CheckersData.redBoardValues[x][y];
+//                            break;
+//                    }
+//                }else
                 if (board.getLegalJumpsFrom(piece, x, y) != null) {
-                    int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
-                    if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
-                        eval += numJumps;
-                    else
-                        eval -= numJumps;
+                    if ((board.numBlack() + board.numBlackKing() - board.numRed() - board.numRedKing()) > 0) {
+                        int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
+                        if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
+                            eval += 2*numJumps;
+                        else
+                            eval -= numJumps;
+                    } else {
+                        int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
+                        if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
+                            eval += numJumps;
+                        else
+                            eval -= 2*numJumps;
+                    }
                 }
             }
-        }*/
-        //return eval;
+        }
+        return eval;
+        */return board.numBlack() + 2*board.numBlackKing() -
+                board.numRed() - 2*board.numRedKing();
+    }
+}
+
+class MovePair{
+
+    public CheckersMove move;
+    public int value;
+
+    public MovePair(CheckersMove mv, int val){
+        move = mv;
+        value = val;
     }
 }
