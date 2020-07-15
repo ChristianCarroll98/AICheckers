@@ -8,7 +8,7 @@
  *
  * @author phil
  */
-public class AIblackMove {
+public class AIblackMove{
 
     //This is the current state of the game
     CheckersGame currentGame;
@@ -21,175 +21,136 @@ public class AIblackMove {
     public AIblackMove(CheckersGame game, CheckersMove moves[]) {
         currentGame = game;
         legalMoves = moves;
-		iter = 5;
     }
 
     // This is where your logic goes to make a move.
     public CheckersMove nextMove() {
-		
-		//MovePair testPair = new MovePair(currentGame.boardData.getLegalMoves(CheckersData.BLACK)[0], 10);
-		//System.out.println(testPair.move.toString() + ", " + testPair.value);
-		//returns best move based on minmax function
-
-        return minmax(currentGame.boardData, iter);
+        return minmax(System.currentTimeMillis(), 300, currentGame.boardData, null, Integer.MIN_VALUE, Integer.MAX_VALUE, true).move;
     }
 	
-	CheckersMove minmax(CheckersData b, int iter){
-		
-		// create new board so we don't mess up the original
-		CheckersData board = new CheckersData(b);
-		
-		//set best black move to default mve from 0,0 to 0,0 in case no moves exist
-		CheckersMove bestBlackMove = new CheckersMove(0,0,0,0);
-		
-		// get all black moves
-		CheckersMove blackMoves[] = board.getLegalMoves(CheckersData.BLACK);
-		
-		if(blackMoves != null && blackMoves.length > 0){
-			
-			//initialize best black move to first one in list
-			bestBlackMove = blackMoves[0];
-			
-			//create variable to keep track of highest minimum
-			int bestMinmax = Integer.MIN_VALUE;
-			
-			//iterate through all black moves
-			for(int i = 0; i<blackMoves.length; i++){
-				//reset board to initial state
-				board = new CheckersData(b);
-				
-				//make the black move
-				board.makeMove(blackMoves[i]);
-				
-				//if red has a move, make the best one. method is below.
-				//otherwise, this move makes red lose so pick it.
-				if(!makeBestRedMove(board))
-					return blackMoves[i];
+	MovePair minmax(long startTime, int depth, CheckersData initialBoard, CheckersMove initialMove, int alpha, int beta, boolean maximizing) {
 
-				//find new evaluated value of the board after red makes its move
-				int minValue = evaluate(board);
-				
-				//recursion code
-				if(iter > 0 && minValue > 0){
-					//call minmax again with board after the current move, and iteration -1
-					board.makeMove(minmax(board, iter - 1));
-					
-					//veriable that holds new value of board
-					//(perhaps this is the state of the board at the end of the iteration?)
-					int testVal = evaluate(board);
-					
-					//if the test value is larger than the best Minmax then set the stuff.
-					if( testVal > bestMinmax ){
-						bestMinmax = testVal;
-						bestBlackMove = blackMoves[i];
-					}
+		if (!(((System.currentTimeMillis() - startTime) > 6000) || (depth == 0) ||
+                (initialBoard.getLegalMoves(CheckersData.BLACK) == null) || (initialBoard.getLegalMoves(CheckersData.RED) == null))){
+
+			if (maximizing) {
+				MovePair maxEval = new MovePair(initialMove, Integer.MIN_VALUE);
+
+				for (CheckersMove blackMove : initialBoard.getLegalMoves(CheckersData.BLACK)) {
+
+					CheckersData testBoard = new CheckersData(initialBoard);
+					testBoard.makeMove(blackMove);
+
+					MovePair eval;
+
+					if(testBoard.getLegalJumpsFrom(testBoard.pieceAt(blackMove.toRow, blackMove.toCol),
+                            blackMove.toRow, blackMove.toCol) != null)
+                        maximizing = !maximizing;
+
+                    if (initialMove == null) {
+                        eval = minmax(startTime, depth - 1, testBoard, blackMove, alpha, beta, !maximizing);
+                    }else {
+                        eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
+                    }
+
+                    if(maxEval.value <= eval.value) maxEval = eval;
+
+					alpha = Math.max(alpha, eval.value);
+
+					if (beta <= alpha) break;
 				}
-				//base case, if minvalue of board is larger than minmax then set the stuff.
-				else{
-					if(minValue > bestMinmax){
-						bestMinmax = minValue;
-						bestBlackMove = blackMoves[i];
-					}
-				}
-				
+
+				return maxEval;
+			} else {
+				MovePair minEval = new MovePair(initialMove, Integer.MAX_VALUE);
+
+                for (CheckersMove redMove : initialBoard.getLegalMoves(CheckersData.RED)) {
+
+                    CheckersData testBoard = new CheckersData(initialBoard);
+                    testBoard.makeMove(redMove);
+
+                    if(testBoard.getLegalJumpsFrom(testBoard.pieceAt(redMove.toRow, redMove.toCol),
+                            redMove.toRow, redMove.toCol) != null)
+                        maximizing = !maximizing;
+
+                    MovePair eval = minmax(startTime, depth - 1, testBoard, initialMove, alpha, beta, !maximizing);
+
+                    if(minEval.value >= eval.value) minEval = eval;
+
+                    beta = Math.min(beta, eval.value);
+
+                    if (beta <= alpha) break;
+                }
+                return minEval;
 			}
-		}//end if statement and black moves for loop
-		return bestBlackMove;
-	}
-	
-	/**
-	* Picks best red move and makes it, then returns true.
-	* If no moves are available, return false.
-	*/
-	boolean makeBestRedMove(CheckersData board){
-		
-		//find all red moves
-		CheckersMove redMoves[] = board.getLegalMoves(CheckersData.RED);
-		
-		//if no red moves exist, return false
-		if(redMoves != null && redMoves.length > 0) {
-		
-			//otherwise set best move to first in list initially
-			CheckersMove bestRedMove = redMoves[0];
-			
-			//create variable to hold minimum evaluated value
-			int minValue = Integer.MAX_VALUE;
-			
-			//iterate through red moves
-			for(int i = 0; i<redMoves.length; i++){
-				//create copy of board
-				CheckersData redTest = new CheckersData(board);
-				
-				//make the red move
-				redTest.makeMove(redMoves[i]);
-				
-				//evaluate board and if the value is lower, set new best move and min value.
-				int testVal = evaluate(redTest);
-				if( testVal < minValue ){
-					minValue = testVal;
-					bestRedMove = redMoves[i];
-				}
-			}
-			//make the best red move and return true
-			board.makeMove(bestRedMove);
-			return true;
 		}
-		//if no red moves exist, return false
-		return false;
+		return new MovePair(initialMove, evaluate(initialBoard));
 	}
-	
-    // One thing you will probably want to do is evaluate the current
-    // goodness of the board.  This is a toy example, and probably isn't
-    // very good, but you can tweak it in any way you want.  Not only is
-    // number of pieces important, but board position could also be important.
-    // Also, are kings more valuable than regular pieces?  How much?
+
     int evaluate(CheckersData board) {
-		
-		//added boardValue static array to CheckersData constructor
-		//eval += (value of piece at (0,0) * board.boardValues[0][0];)
 
-		int eval = 0;
+        if(board.getLegalMoves(CheckersData.RED) == null)
+            return Integer.MAX_VALUE;
 
-		for(int y = 0; y < 8; y++){
-			for(int x = Math.floorMod(y,2); x < 8; x+=2){ //x starts at 0 when y is even and starts at 1 when y is odd
+        if(board.getLegalMoves(CheckersData.BLACK) == null)
+            return Integer.MIN_VALUE;
+/*
+        int eval = board.numBlack() + 2*board.numBlackKing() -
+                board.numRed() - 2*board.numRedKing();
 
-				int piece = board.pieceAt(x,y);
-				int pieceVal = 0;
-				switch(piece){
-					case CheckersData.BLACK:
-						pieceVal = 2;
-						break;
-					case CheckersData.BLACK_KING:
-						pieceVal = 4;
-						break;
-					case CheckersData.RED:
-						pieceVal = -1;
-						break;
-					case CheckersData.RED_KING:
-						pieceVal = -2;
-						break;
-				}
+        for(int y = 0; y < 8; y++) {
+            for (int x = Math.floorMod(y, 2); x < 8; x += 2) { //x starts at 0 when y is even and starts at 1 when y is odd
 
-				eval += (CheckersData.boardValues[0][0] * pieceVal); //multiply board value by piece value.
-			}
-		}
+                int piece = board.pieceAt(x, y);
 
+                if (piece == CheckersData.EMPTY) break;
+
+//                if(board.numBlack() + board.numBlackKing() + board.numRed() + board.numRedKing() == 24) { // set up initial moves
+//                    switch (piece) {
+//                        case CheckersData.BLACK:
+//                            eval += CheckersData.blackBoardValues[x][y];
+//                            break;
+//                        case CheckersData.BLACK_KING:
+//                            eval += 2 * CheckersData.blackBoardValues[x][y];
+//                            break;
+//                        case CheckersData.RED:
+//                            eval -= CheckersData.redBoardValues[x][y];
+//                            break;
+//                        case CheckersData.RED_KING:
+//                            eval -= 2 * CheckersData.redBoardValues[x][y];
+//                            break;
+//                    }
+//                }else
+                if (board.getLegalJumpsFrom(piece, x, y) != null) {
+                    if ((board.numBlack() + board.numBlackKing() - board.numRed() - board.numRedKing()) > 0) {
+                        int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
+                        if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
+                            eval += 2*numJumps;
+                        else
+                            eval -= numJumps;
+                    } else {
+                        int numJumps = board.getLegalJumpsFrom(piece, x, y).length;
+                        if (piece == CheckersData.BLACK || piece == CheckersData.BLACK_KING)
+                            eval += numJumps;
+                        else
+                            eval -= 2*numJumps;
+                    }
+                }
+            }
+        }
         return eval;
+        */return board.numBlack() + 2*board.numBlackKing() -
+                board.numRed() - 2*board.numRedKing();
     }
 }
-/*
-numRed and such
 
-evaluate
+class MovePair{
 
-jump
+    public CheckersMove move;
+    public int value;
 
-piece at
-
-* make minmax method
-
-get legal jumps from
-
-be sure to call getLegalMoves each time a move is made or simulated
-
-*/
+    public MovePair(CheckersMove mv, int val){
+        move = mv;
+        value = val;
+    }
+}

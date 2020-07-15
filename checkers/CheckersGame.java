@@ -20,6 +20,8 @@ interface GameListener {
 
 public class CheckersGame {
 
+    public boolean doAuto = true;
+
     CheckersData boardData;
     CheckersMove[] legalMoves;  // An array containing the legal moves for the
     //   current player.
@@ -134,37 +136,40 @@ public class CheckersGame {
         if (!gameInProgress()) {
             console("Click \"New Game\" to start a new game.");
         } else {
-            /*if (currentPlayer() == CheckersData.BLACK
-                    && aiBlack == true) {
-                console("Click to move black");
-                AIblackMove blacksMove = new AIblackMove(this,legalMoves);
-                doMakeMove(blacksMove.nextMove());
-                return;
-            } else if (currentPlayer() == CheckersData.RED
-                    && aiRed == true) {
-                console("Click to move red");
-                AIredMove redsMove = new AIredMove(this,legalMoves);
-                // AIredMoveBetter redsMove = new AIredMoveBetter(this, legalMoves);
-                doMakeMove(redsMove.nextMove());
-                return;
-            }*/
-        
-		
-			if (currentPlayer() == CheckersData.BLACK
-                    && aiBlack == true) {
-                //System.out.println("black move");
-				try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
-                AIblackMove blacksMove = new AIblackMove(this,legalMoves);
-                doMakeMove(blacksMove.nextMove());
-                return;
-            } else if (currentPlayer() == CheckersData.RED
-                    && aiRed == true) {
-                //System.out.println("red move");
-				try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
-                AIredMove redsMove = new AIredMove(this,legalMoves);
-                // AIredMoveBetter redsMove = new AIredMoveBetter(this, legalMoves);
-                doMakeMove(redsMove.nextMove());
-                return;
+
+            if(doAuto)
+            {
+                if (currentPlayer() == CheckersData.BLACK
+                        && aiBlack == true) {
+                    //System.out.println("black move");
+                    //try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
+                    AIblackMove blacksMove = new AIblackMove(this, legalMoves);
+                    doMakeMove(blacksMove.nextMove());
+                    return;
+                } else if (currentPlayer() == CheckersData.RED
+                        && aiRed == true) {
+                    //System.out.println("red move");
+                    //try{Thread.sleep(50);}catch(Exception e){System.out.println("sleep error: " + e.toString());}
+                    AIredMove redsMove = new AIredMove(this, legalMoves);
+                    //AIredMoveBetter redsMove = new AIredMoveBetter(this, legalMoves);
+                    doMakeMove(redsMove.nextMove());
+                    return;
+                }
+            }else {
+                if (currentPlayer() == CheckersData.BLACK
+                        && aiBlack == true) {
+                    console("Click to move black");
+                    AIblackMove blacksMove = new AIblackMove(this,legalMoves);
+                    doMakeMove(blacksMove.nextMove());
+                    return;
+                } else if (currentPlayer() == CheckersData.RED
+                        && aiRed == true) {
+                    console("Click to move red");
+                    AIredMove redsMove = new AIredMove(this, legalMoves);
+                    //AIredMoveBetter redsMove = new AIredMoveBetter(this, legalMoves);
+                    doMakeMove(redsMove.nextMove());
+                    return;
+                }
             }
 		
 
@@ -174,7 +179,7 @@ public class CheckersGame {
          might change a previous selection.)  Reset the message, in
          case it was previously displaying an error . */
         for (int i = 0; i < legalMoves.length; i++) {
-            System.out.println("In one");
+            //System.out.println("In one");
             if (legalMoves[i].fromRow == row && legalMoves[i].fromCol == col) {
                 selectedRow = row;
                 selectedCol = col;
@@ -191,7 +196,7 @@ public class CheckersGame {
         /* If no piece has been selected to be moved, the user must first
          select a piece.  Show an error message and return. */
         if (selectedRow < 0) {
-                        System.out.println("In two");
+                        //System.out.println("In two");
 
             console("Click the piece you want to move.");
             return;
@@ -200,7 +205,7 @@ public class CheckersGame {
         /* If the user clicked on a square where the selected piece can be
          legally moved, then make the move and return. */
         for (int i = 0; i < legalMoves.length; i++) {
-                        System.out.println("In three");
+                        //System.out.println("In three");
 
             if (legalMoves[i].fromRow == selectedRow && legalMoves[i].fromCol == selectedCol
                     && legalMoves[i].toRow == row && legalMoves[i].toCol == col) {
